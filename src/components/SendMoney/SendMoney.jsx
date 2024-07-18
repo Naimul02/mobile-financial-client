@@ -3,6 +3,7 @@ import React from 'react';
 import useAxiosPublic from '../../useAxiosPublic/useAxiosPublic';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 
 const SendMoney = () => {
@@ -15,12 +16,12 @@ const SendMoney = () => {
     console.log("email ", email);
 
 
-    const axiosPublic = useAxiosPublic();
+    const axiosSecure = useAxiosSecure();
 
     const { data: balance, refetch } = useQuery({
         queryKey: ['balance'],
         queryFn: async () => {
-            const res = await axiosPublic(`/balance?email=${email}`)
+            const res = await axiosSecure.get(`/balance?email=${email}`)
             console.log(res.data);
             return res.data
         }
@@ -39,7 +40,7 @@ const SendMoney = () => {
                     amount : amount,
                     email : email
             }
-            axiosPublic.post('/sendMoneyInfo' , info)
+            axiosSecure.post('/sendMoneyInfo' , info)
             .then(res => {
                 console.log(res.data);
                 if(res.data.insertedId){

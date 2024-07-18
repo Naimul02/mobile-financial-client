@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "../../useAxiosPublic/useAxiosPublic";
+
 import { Link } from "react-router-dom";
+import useAxiosPublic from "../../useAxiosPublic/useAxiosPublic";
 
 
 const Home = () => {

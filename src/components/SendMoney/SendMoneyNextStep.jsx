@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "../../useAxiosPublic/useAxiosPublic";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 
 const SendMoneyNextStep = () => {
     const [disabled , setDisabled] = useState(false);
     const [pinError , setPinError] = useState("");
-        const axiosPublic = useAxiosPublic();
+        const axiosSecure = useAxiosSecure();
         const [charge , setCharge] = useState(0)
         const {phoneNumber} = useParams();
 
@@ -19,7 +19,7 @@ const SendMoneyNextStep = () => {
         const {data : balance } = useQuery({
             queryKey : ['balance'],
             queryFn : async() => {
-                    const res = await axiosPublic(`/balance?email=${email}`)
+                    const res = await axiosSecure(`/balance?email=${email}`)
                     console.log(res.data);
                     return res.data
             }
@@ -28,7 +28,7 @@ const SendMoneyNextStep = () => {
     const {data : sendMoneyInfo } = useQuery({
             queryKey : ['info'],
             queryFn : async() => {
-                     const res = await axiosPublic(`/sendMoneyInfo?number=${phoneNumber}`)
+                     const res = await axiosSecure(`/sendMoneyInfo?number=${phoneNumber}`)
 
                      console.log(sendMoneyInfo);
                      const amount = parseInt(res?.data?.amount)
@@ -50,34 +50,67 @@ const SendMoneyNextStep = () => {
             // const balance = balance;
             console.log( "amount : " , amount , "balance : " , currentBalance  , "pin" , pin);
 
-            axiosPublic(`pinMatch/${email}/${pin}`)
+            axiosSecure(`pinMatch/${email}/${pin}`)
             .then(res => {
-                console.log(res.data)
+                console.log("pin koi " , res.data)
                 setPinError(res.data)
+
+                 if(res.data.error === 'Sorry! Pin does not match'){{
+                    toast.error('Your Pin does not match. Please try again.');
+                    setDisabled(true);
+                    return;
+                }
+    
+                }
+                else if(amount < 50 ){
+                
+                    toast.error('Sorry you can not do transactions below 50 taka')
+                    setDisabled(true);
+                    return ;
+                }
+                else if( amount >= currentBalance){
+                        toast.error("You don't have enough money")
+                        setDisabled(true)
+                        return ;
+                }
+
+                axiosSecure(`/haveNumber/${phoneNumber}`)
+                .then(res => {
+                    
+                    
+                    if(!res.data){
+                            axiosSecure.post(`/sendMoney/${phoneNumber}?amount=${amount}`)
+                            .then(res => {
+                                console.log(res.data)
+                                if(res.data.insertedId){
+                                        toast.success('Send money has been successful')
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error.message)
+                            })
+                    }
+                    else{
+                            axiosSecure.patch(`/sendMoney/${phoneNumber}?amount=${amount}`)
+                            .then(res => {
+                                console.log(res.data)
+                                if(res.data){
+                                    toast.success('send money has been succesful')
+                                }
+                            })
+                    }
+                })
             })
             .catch(error => {
                 console.error(error.message)
             })
 
-            if(amount <= 50 ){
-                // Todo :
-                toast.error('Sorry you can not do transactions below 50 taka')
-                setDisabled(true)
-            }
-            else if( amount >= currentBalance){
-                    toast.error("You don't have enough money")
-                    setDisabled(true)
-            }
-            else {
+            
+            
 
-            }
-
-            // TODO:
-            axiosPublic(`/haveNumber/${phoneNumber}`)
-            .then(res => {
-                console.log(res.data);
-            })
-            // axiosPublic.patch(`updateMoney/${phoneNumber}`)
+            
+           
+            
             
     }
     return (
