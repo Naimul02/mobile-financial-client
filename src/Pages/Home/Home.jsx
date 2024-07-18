@@ -23,7 +23,7 @@ const Home = () => {
         <div className="mt-20">
             <h1 className="text-2xl font-semibold text-center my-10 mb-3">Your Current Balance</h1>
              <div className="p-5 border rounded max-w-[300px] flex gap-5 mx-auto">
-                <h2 className="text-xl font-semibold">Balance</h2>
+                <h2 className="text-xl font-semibold">Balance : </h2>
                 <h2 className="text-lg font-semibold">{balance?.balance}</h2>
 
              </div>

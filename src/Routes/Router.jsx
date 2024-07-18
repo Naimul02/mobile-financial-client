@@ -10,6 +10,7 @@ import AllUsers from "../Dashboard/AllUsers/AllUsers";
 import Home from "../Pages/Home/Home";
 import Balance from "../Dashboard/Balance/Balance";
 import SendMoney from "../components/SendMoney/SendMoney";
+import SendMoneyNextStep from "../components/SendMoney/SendMoneyNextStep";
 
   const router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ import SendMoney from "../components/SendMoney/SendMoney";
             {
                 path : '/sendMoney',
                 element : <SendMoney></SendMoney>
+            },
+            {
+                path : '/sendMoneyNextStep/:phoneNumber',
+                element : <SendMoneyNextStep></SendMoneyNextStep>
             }
       ]
     },
